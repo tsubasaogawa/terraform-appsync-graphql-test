@@ -1,41 +1,11 @@
-data "aws_iam_policy_document" "role" {
-  statement {
-    actions = [
-      "sts:AssumeRole",
-    ]
-    principals {
-      type        = "Service"
-      identifiers = ["appsync.amazonaws.com"]
-    }
-  }
-}
-
-resource "aws_iam_role" "this" {
-  name               = "${var.name}-role"
-  assume_role_policy = data.aws_iam_policy_document.role.json
-}
-
-data "aws_iam_policy_document" "policy" {
-  statement {
-    actions = [
-      "dynamodb:PutItem",
-      "dynamodb:Scan",
-    ]
-    resources = [
-      var.dynamo_table_arn,
-    ]
-  }
-}
-
-resource "aws_iam_role_policy" "this" {
-  name   = "${var.name}-policy"
-  role   = aws_iam_role.this.id
-  policy = data.aws_iam_policy_document.policy.json
+data "local_file" "graphql_schema" {
+  filename = "modules/appsync/resources/schema.graphql"
 }
 
 resource "aws_appsync_graphql_api" "this" {
   name                = var.name
   authentication_type = "API_KEY"
+  schema              = data.local_file.graphql_schema.content
 }
 
 resource "aws_appsync_api_key" "this" {
@@ -50,5 +20,34 @@ resource "aws_appsync_datasource" "this" {
 
   dynamodb_config {
     table_name = var.dynamo_table_name
+  }
+}
+
+data "local_file" "resolver_requests" {
+  for_each = var.resolvers
+  filename = "modules/appsync/resources/resolver_templates/${each.key}/request.template"
+}
+
+data "local_file" "resolver_responses" {
+  for_each = var.resolvers
+  filename = "modules/appsync/resources/resolver_templates/${each.key}/response.template"
+}
+
+resource "aws_appsync_resolver" "this" {
+  for_each    = var.resolvers
+  api_id      = aws_appsync_graphql_api.this.id
+  field       = lookup(each.value, "field")
+  type        = lookup(each.value, "type")
+  data_source = lookup(each.value, "data_source") # aws_appsync_datasource.this.name
+
+  request_template  = lookup(data.local_file.resolver_requests, each.key).content
+  response_template = lookup(data.local_file.resolver_responses, each.key).content
+
+  caching_config {
+    caching_keys = [
+      "$context.identity.sub",
+      "$context.arguments.id"
+    ]
+    ttl = 60
   }
 }

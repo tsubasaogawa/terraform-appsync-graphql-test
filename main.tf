@@ -6,7 +6,8 @@ module "dynamodb" {
 module "appsync" {
   source            = "./modules/appsync"
   name              = local.appsync.name
-  datasource_name   = replace(local.appsync.datasource_name, "-", "_")
+  datasource_name   = local.appsync.datasource_name
   dynamo_table_name = module.dynamodb.dynamo_table_name
   dynamo_table_arn  = module.dynamodb.dynamo_table_arn
+  resolvers         = local.appsync.resolvers
 }

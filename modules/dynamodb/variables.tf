@@ -1,14 +1,13 @@
 variable table_name {
-  description = ""
-  default     = ""
+  description = "DynamoDB table name"
 }
 
 variable read_capacity {
-  description = ""
+  description = "Read capacity"
   default     = 1
 }
 
 variable write_capacity {
-  description = ""
+  description = "Write capacity"
   default     = 1
 }
