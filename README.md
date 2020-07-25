@@ -1,6 +1,6 @@
 # terraform-appsync-graphql-test
 
-An example for using GraphQL with AWS AppSync provisioned by Terraform.
+An example for using GraphQL with AWS AppSync provisioned by Terraform.  
 Terraform creates the following AWS resources:
 
 - AppSync
@@ -27,7 +27,7 @@ terraform apply
 
 ## Architecture
 
-
+![diagram](https://user-images.githubusercontent.com/7788821/88457458-8abeee00-cec1-11ea-9bc5-9d54532cc42d.png)
 
 ## Example
 
