@@ -27,7 +27,7 @@ terraform apply
 
 ## Architecture
 
-![diagram](https://user-images.githubusercontent.com/7788821/88457458-8abeee00-cec1-11ea-9bc5-9d54532cc42d.png)
+![diagram](https://raw.githubusercontent.com/tsubasaogawa/terraform-appsync-graphql-test/images/diagram.png)
 
 ## Example
 
